@@ -13,13 +13,14 @@ module Players
 				mat_type: :phong,
 				color: 0x0000ff
 			}
-			super(x: 0, y: level, z: 0, mesh_attr: attr)
+			super(x: 0, y: 2, z: 0, mesh_attr: attr)
 
 			# 交差判定用Raycasterの向きを決定する単位ベクトルを生成する
 			@norm_vector = Mittsu::Vector3.new(0, 1, 0).normalize
 
 			# 交差判定用のRaycasterオブジェクトを生成する
 			@raycaster = Mittsu::Raycaster.new
+			@speed = 0
 		end
 
 		# キャラクタの移動に使用されるキーの定義
@@ -28,7 +29,8 @@ module Players
 				:k_a,  # 左移動
 				:k_d,  # 右移動
 				:k_w,  # 上移動
-				:k_s   # 下移動
+				:k_s,  # 下移動
+				:k_space 
 			]
 		end
 
@@ -39,6 +41,12 @@ module Players
 			self.mesh.position.x += 0.1 if key_statuses[control_keys[1]]
 			self.mesh.position.z -= 0.1 if key_statuses[control_keys[2]]
 			self.mesh.position.z += 0.1 if key_statuses[control_keys[3]]
+			@speed = 1.0 if key_statuses[control_keys[4]] && self.mesh.position.y <= -8
+			@speed -= 0.1 if self.mesh.position.y > -8 
+			self.mesh.position.y += @speed 
+			if self.mesh.position.y <= -8
+				self.mesh.position.y = -8
+			end
 		end
 
 		# 爆弾迎撃メソッド。
